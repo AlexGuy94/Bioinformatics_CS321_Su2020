@@ -1,7 +1,9 @@
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.lang.reflect.Array;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 public class GeneBankSearch {
@@ -13,10 +15,14 @@ public class GeneBankSearch {
 	static int cacheSize = 0;
 	static int debug = 0;
 
+	/**
+	 * @param args
+	 */
+
 	public static void main(String args[]) {
 
 
-
+//parse arguments
 		if(Integer.parseInt(args[0])==0 ||  Integer.parseInt(args[0])==1) {
 			cache = Integer.parseInt(args[0]);
 			if (cache==0) {
@@ -54,26 +60,49 @@ public class GeneBankSearch {
 				System.out.println("Please use a 0 or 1 for the debug level");
 			}
 		}
+		
+		//testing output
 		System.out.println(cache + ", " + bTreeFileName + ", " + queryFileName + ", " + cacheSize + ", " + debug);
-
-	}
-
-	private Byte[] ConvertFile() {
-		Byte[] nodeArray = new Byte[200];
+		
+		
+		// Add Files to be read and extract metadata
+		
 		try {
 			RandomAccessFile bTreeFile = new RandomAccessFile(bTreeFileName, "r");
-			for(int i=0;i<bTreeFile.length();i++) {
-				if(nodeArray.length == i) {
-					nodeArray = Arrays.copyOf(nodeArray, nodeArray.length*2);
-				}
-				nodeArray[i] = bTreeFile.readByte();
-			}
+			FileInputStream queryFile = new FileInputStream(queryFileName);
+
+			ByteBuffer byteBuffer = ByteBuffer.allocate(12);
+			bTreeFile.read(byteBuffer.array());
+			
+			//adjust order of metadata inpupts if necessary 
+			int degree = byteBuffer.getInt();
+			int sequenceLength = byteBuffer.getInt();
+			int rootLocation = byteBuffer.getInt();
+			
+			//build a root node from bTreeFile
+			BTreeNode rootNode = new BTreeNode();
+			
+			//find the first byte of the Root Node
+			bTreeFile.seek(rootLocation);
+			
+			//Need to read the node with a Node class read method
+			rootNode.readNode(bTreeFile);
+			
+			//Make a BTree
+			BTree bTree = new BTree(degree, sequenceLength, rootLocation);
+			
+			//Add Cache Option...Search BTree...Output to Console/file
+			
+			
 			
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		return nodeArray;
 	}
+
+	
+	
+	
 }
 
