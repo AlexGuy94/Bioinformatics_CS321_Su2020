@@ -1,10 +1,12 @@
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.Scanner;
 
 public class GeneBankSearch {
 
@@ -79,9 +81,8 @@ public class GeneBankSearch {
 			int sequenceLength = byteBuffer.getInt();
 			int rootLocation = byteBuffer.getInt();
 			
-			//build a root node from bTreeFile
-			BTreeNode rootNode = new BTreeNode();
-			
+			//build a root node from bTreeFile, will need degree
+			BTreeNode rootNode = new BTreeNode(degree);
 			//find the first byte of the Root Node
 			bTreeFile.seek(rootLocation);
 			
@@ -89,19 +90,40 @@ public class GeneBankSearch {
 			rootNode.readNode(bTreeFile);
 			
 			//Make a BTree
-			BTree bTree = new BTree(degree, sequenceLength, rootLocation);
+			BTree bTree = new BTree(degree, bTreeFile);
+			bTree.setRoot(rootNode);
 			
+			//Search for DNA subsequences in BTree and write to file
+			Scanner scanner = new Scanner(queryFile);
+			FileWriter writer;
+			writer = new FileWriter("dump");
+			
+			//scan for subsequence and write to dump file and or print to console
+			while(scanner.hasNext()) {
+				String dnaSequence = scanner.next();
+				long longSequence = convertToLong(dnaSequence);
+				int frequency = bTree.search(longSequence);
+				System.out.println(dnaSequence + ": " + frequency);
+				if(debug==1) {
+					 writer.write(dnaSequence + ": " + frequency);
+				}
+			}
+			writer.close();
+			scanner.close();
+			queryFile.close();
 			//Add Cache Option...Search BTree...Output to Console/file
 			
 			
 			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
+			
 		}
 	}
 //convert DNA substring to Long data type
 	private static long convertToLong(String dna) {
+		dna = dna.toLowerCase();
 		long seq = Long.parseLong(dna, 32);
 		
 		return seq;
