@@ -9,11 +9,11 @@ import java.util.Arrays;
 public class GeneBankSearch {
 
 
-	static int cache = 0;
-	static String bTreeFileName = null;
-	static String queryFileName = null;
-	static int cacheSize = 0;
-	static int debug = 0;
+	private static int cache = 0;
+	private static String bTreeFileName = null;
+	private static String queryFileName = null;
+	private static int cacheSize = 0;
+	private static int debug = 0;
 
 	/**
 	 * @param args
@@ -63,8 +63,8 @@ public class GeneBankSearch {
 		
 		//testing output
 		System.out.println(cache + ", " + bTreeFileName + ", " + queryFileName + ", " + cacheSize + ", " + debug);
-		
-		
+		System.out.println(convertToLong("abc"));
+		System.out.println(convertToString(convertToLong(("abc"))));
 		// Add Files to be read and extract metadata
 		
 		try {
@@ -100,9 +100,18 @@ public class GeneBankSearch {
 			e.printStackTrace();
 		}
 	}
-
-	
-	
+//convert DNA substring to Long data type
+	private static long convertToLong(String dna) {
+		long seq = Long.parseLong(dna, 32);
+		
+		return seq;
+	}
+//convert Long substring to String data type
+	private static String convertToString(long dna) {
+		
+		String seq = Long.toString(dna,32);
+		return seq;
+	}
 	
 }
 
