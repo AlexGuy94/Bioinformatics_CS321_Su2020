@@ -8,30 +8,30 @@
  *
  */
 
-public class TreeNode {
+public class BTreeNode {
 	// ============================================================
 	// Instance Variables
 	// ============================================================
     
 	private int parent, numKeys, loc, degree; 
     private int[] children; 
-    private TreeNode[] nodes;
-    private TreeObject[] treeObjects; 
+    private BTreeNode[] nodes;
+    private BTreeObject[] treeObjects; 
     private boolean leaf;
 
 	/**
 	 * Default constructor
 	 * @param t - the minimum degree of the BTree
 	 */
-    public TreeNode(int t) {
+    public BTreeNode(int t) {
 	
 		this.setDegree(t);
 		this.parent = 0;
 		this.children = new int[2*t];
-		this.nodes = new TreeNode[2*t];
-		this.treeObjects = new TreeObject[2*t-1];
+		this.nodes = new BTreeNode[2*t];
+		this.treeObjects = new BTreeObject[2*t-1];
 		for (int i=0; i<treeObjects.length; i++) {
-			treeObjects[i] = new TreeObject((long) (0));
+			treeObjects[i] = new BTreeObject((long) (0));
 		}
 		this.numKeys = 0;
 		this.leaf = true;
@@ -64,7 +64,7 @@ public class TreeNode {
 	 * Gets treeObject at given index.
 	 *
 	 */
-    public TreeObject getTreeObject(int i) {
+    public BTreeObject getBTreeObject(int i) {
 		return this.treeObjects[i];
     }
 	
@@ -72,7 +72,7 @@ public class TreeNode {
 	 * Sets treeObject at given index.
 	 *
 	 */	
-	public void setTreeObject(int i, TreeObject treeObject) {
+	public void setTreeObject(int i, BTreeObject treeObject) {
 		this.treeObjects[i] = treeObject;
     }
 
