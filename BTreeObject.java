@@ -42,6 +42,9 @@
 		
 		return key;
 	}
- 
+	public void setKey(long key){
+		
+		this.key = key;
+	}
  
  }

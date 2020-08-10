@@ -6,44 +6,73 @@ public class BTree {
 	private int degree;
 	private BTreeNode root;
 	private RandomAccessFile bTreeFile;
-	private String fileName;
 	
 	
-	
+	/**
+	 * Constructor for BTree
+	 * 
+	 * @param degree
+	 * @param bTreeFile
+	 */
 	public BTree(int degree, RandomAccessFile bTreeFile) {
 		this.degree = degree;
 		root = new BTreeNode(degree);
-		this.fileName = fileName;
-		
-		
+		this.bTreeFile = bTreeFile;
 	}
-
 	
+	/**
+	 * Returns the root node of the BTree
+	 * 
+	 * @return 
+	 */
 	public BTreeNode getRoot() {
 		return root;
 	}
 	
+	/**
+	 * Sets the root of the Btree
+	 * 
+	 * @param root
+	 */
 	public void setRoot(BTreeNode root) {
 		
 		this.root = root;
 	}
 	
+	/**
+	 * Reads bytes for the RandomAccessFile at a given locationa and parses into a BTreeNode.
+	 * 
+	 * @param location
+	 * @return node at a given location
+	 * @throws IOException
+	 */
 	public BTreeNode readNode(int location) throws IOException {
 		
 		bTreeFile.seek(location);
 		BTreeNode node = new BTreeNode(degree);
 		node.readNode(bTreeFile);
 		return node;
-		
 	}
 	
+	/**Writes a node to file at it's listed location after updates to the Node.
+	 * 
+	 * @param node
+	 * @throws IOException
+	 */
 	public void writeNode(BTreeNode node) throws IOException {
 		bTreeFile.seek(node.getLoc());
 		node.writeNode(bTreeFile);
-		
 	}
 	
-	//Search BTree
+	
+	/**
+	 * BTreeSearch searches the BTree for a specific key and returns the frequency of the key.
+	 * 
+	 * @param node
+	 * @param key
+	 * @return
+	 * @throws IOException
+	 */
 	public int BTreeSearch(BTreeNode node, long key) throws IOException {
 		int i=0;
 		while(i<node.getnumKeys() && key>node.getBTreeObject(i).getKey()) {
@@ -58,8 +87,9 @@ public class BTree {
 			node = readNode(node.getChild(i));
 			return BTreeSearch(node, key);
 		}
-		
 	}
+	
+	
 	
 	//Split-Child
 	private void childSplit(BTreeNode parentNode, int index, BTreeNode childNode) throws IOException {
@@ -94,6 +124,56 @@ public class BTree {
 	
 	
 	//Insert
+	public void insert(BTree tree, long key) throws IOException {
+	
+		BTreeNode r = tree.getRoot();
+		if(r.getnumKeys()==2*degree-1) {
+			int newNodeLocation = (int) bTreeFile.length();
+			BTreeNode newNode = new BTreeNode(newNodeLocation);
+			tree.setRoot(newNode);
+			newNode.setLeaf(false);
+			newNode.setnumKeys(0);
+			newNode.setChildPointer(0, r.getLoc());
+			childSplit(newNode, 1, r);
+			insertNonFull(newNode, key);
+			
+		} else {
+			insertNonFull(r, key);
+		}
+	}
+	
 	
 	//Insert Non-Full
+	private void insertNonFull(BTreeNode node, long key) throws IOException {
+		int i = node.getnumKeys();
+		if (node.isLeaf()) {
+			while(i>=1 && key<node.getBTreeObject(i).getKey()) {
+				node.setTreeKey(i+1, node.getBTreeObject(i).getKey());
+				i--;
+			}
+			node.setTreeKey(i+1, key);
+			node.setnumKeys(node.getnumKeys()+1);
+			writeNode(node);
+		} else {
+			while(i>=1 && key<node.getBTreeObject(i).getKey()) {
+				i--;
+			}
+			i++;
+			BTreeNode childNode = readNode(node.getChild(i));
+			
+			if(childNode.getnumKeys()==2*degree-1) {
+				childSplit(node, i, childNode);
+				if(key>node.getBTreeObject(i).getKey()) {
+					i++;
+				}
+			}
+			insertNonFull(childNode, key);
+		}
+		
+	}
 }
+
+
+
+
+

@@ -1,11 +1,8 @@
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 import java.util.Scanner;
 
 public class GeneBankSearch {
@@ -76,7 +73,7 @@ public class GeneBankSearch {
 			ByteBuffer byteBuffer = ByteBuffer.allocate(12);
 			bTreeFile.read(byteBuffer.array());
 			
-			//adjust order of metadata inpupts if necessary 
+			//adjust order of metadata inputs if necessary 
 			int degree = byteBuffer.getInt();
 			int sequenceLength = byteBuffer.getInt();
 			int rootLocation = byteBuffer.getInt();
