@@ -15,7 +15,7 @@ public class BTreeNode {
     
 	private int parent, numKeys, loc, degree; 
     private int[] children; 
-    private BTreeNode[] nodes;
+    private BTreeNode[] nodes;//is this needed?  I think we should have nodes stored in the tree. The "children" pointers are pointing to the nodes.
     private BTreeObject[] treeObjects; 
     private boolean leaf;
 
@@ -28,14 +28,14 @@ public class BTreeNode {
 		this.setDegree(t);
 		this.parent = 0;
 		this.children = new int[2*t];
-		this.nodes = new BTreeNode[2*t];
+		this.nodes = new BTreeNode[2*t]; //suggest removing
 		this.treeObjects = new BTreeObject[2*t-1];
 		for (int i=0; i<treeObjects.length; i++) {
 			treeObjects[i] = new BTreeObject((long) (0));
 		}
 		this.numKeys = 0;
 		this.leaf = true;
-		this.loc = 0;
+		this.loc = 0; //suggest changing to 12, there are 12 bytes of metadata in the tree so the first node should start at position 12.
     }
 
 
@@ -219,5 +219,45 @@ public class BTreeNode {
     public int getDegree() {
 		return degree;
     }
-
+	
+	/**
+	 * Gets number of bytes in node.
+	 * objects: (2*degree-1)*(long+freq)
+	 * children: (2*degree)*(location)
+	 * parent, numkeys, location: 4 each
+	 * leaf?: 1
+	 */
+    public int bytesInNode(){
+    		int num = (2*degree-1)*(8+4)+(2*degree)*4+4+4+4+1;
+		return num;
+    }
+	
+	/**
+	 * reads a Node from file
+	 * Order: numKeys, location, parent pointer, leaf status, treeObjects(long key, int freq), childpointers
+	 *
+	 */
+    public void readNode(RandomAccessFile bTreeFile){
+	    ByteBuffer buffer = ByteBuffer.allocate(this.bytesInNode());
+	    bTreeFile.read(buffer.array());
+	   
+	    //check ordering on these.
+	    
+	    numKeys = buffer.getInt();
+	    loc = buffer.getInt();
+	    parent = buffer.getInt();
+	    leaf = buffer.get();
+	    
+	    //for loops are somewhat inefficient having to iterate over unfilled nodes
+	    for(int i=0;i<treeObjects.length;i++){
+		    long key = buffer.getLong();
+		    int frequency = buffer.getInt();
+		    TreeObject treeObject = new TreeObject(key, frequency);
+		    treeObjects[i] = treeObject;
+	    for(int 1=0;i<children.length;i++){
+		    children[i] = buffer.getInt();
+	    
+	    
+		
+    }
 }
