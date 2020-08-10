@@ -19,7 +19,7 @@ public class BTreeNode {
     
 	private int parent, numKeys, loc, degree; 
     private int[] children; 
-    private BTreeNode[] nodes;//is this needed?  I think we should have nodes stored in the tree. The "children" pointers are pointing to the nodes.
+   // private BTreeNode[] nodes;//is this needed?  I think we should have nodes stored in the tree. The "children" pointers are pointing to the nodes.
     private BTreeObject[] treeObjects; 
     private boolean leaf;
 
@@ -32,7 +32,7 @@ public class BTreeNode {
 		this.setDegree(t);
 		this.parent = 0;
 		this.children = new int[2*t];
-		this.nodes = new BTreeNode[2*t]; //suggest removing
+		//this.nodes = new BTreeNode[2*t]; //suggest removing
 		this.treeObjects = new BTreeObject[2*t-1];
 		for (int i=0; i<treeObjects.length; i++) {
 			treeObjects[i] = new BTreeObject((long) (0));
@@ -260,8 +260,8 @@ public class BTreeNode {
 	    //for loops are somewhat inefficient having to iterate over unfilled nodes
 	    for(int i=0;i<treeObjects.length;i++){
 		    long key = buffer.getLong();
-		    int frequency = buffer.getInt();
-		    BTreeObject treeObject = new BTreeObject(key);
+		    int frequency = buffer.getInt(); 
+		    BTreeObject treeObject = new BTreeObject(key, frequency);
 		    treeObjects[i] = treeObject;
 	    }
 	    for(int i=0;i<children.length;i++){

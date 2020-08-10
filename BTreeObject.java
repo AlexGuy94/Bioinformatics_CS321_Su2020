@@ -21,6 +21,13 @@
 		
 	}
 	
+	public BTreeObject(long key, int freq){
+		
+		this.key = key;
+		frequency = freq;
+		
+	}
+	
 	
 	public int getFrequency(){
 		

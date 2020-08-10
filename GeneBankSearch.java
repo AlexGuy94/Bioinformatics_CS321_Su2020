@@ -51,7 +51,7 @@ public class GeneBankSearch {
 			if (Integer.parseInt(args[3])>1) {
 				cacheSize = Integer.parseInt(args[3]);
 				c = new Cache(cacheSize);
-			}
+				
 			if (Integer.parseInt(args[4])==1) {
 				debug = 1;
 			} else {
@@ -80,6 +80,7 @@ public class GeneBankSearch {
 			
 			//adjust order of metadata inputs if necessary 
 			int degree = byteBuffer.getInt();
+			@SuppressWarnings("unused")
 			int sequenceLength = byteBuffer.getInt();
 			int rootLocation = byteBuffer.getInt();
 			
@@ -104,11 +105,14 @@ public class GeneBankSearch {
 			while(scanner.hasNext()) {
 				String dnaSequence = scanner.next();
 				long longSequence = convertToLong(dnaSequence);
+				int frequency = 0;
 				if(cache==1) {
+					frequency = bTree.BTreeSearch(bTree.getRoot(),longSequence,c);
 					
-				}
+				} else {
 				
-				int frequency = bTree.BTreeSearch(bTree.getRoot(),longSequence);
+					frequency = bTree.BTreeSearch(bTree.getRoot(),longSequence);
+				}
 				
 				System.out.println(dnaSequence + ": " + frequency);
 				if(debug==1) {
@@ -127,6 +131,7 @@ public class GeneBankSearch {
 			e.printStackTrace();
 			
 		}
+	}
 	}
 //convert DNA substring to Long data type
 	private static long convertToLong(String dna) {
