@@ -91,7 +91,20 @@ public class GeneBankCreateBTree {
 		
 	}
 	
-	
+	//convert DNA substring to Long data type
+		private static long convertToLong(String dna) {
+			dna = dna.toLowerCase();
+			long seq = Long.parseLong(dna, 32);
+			
+			return seq;
+		}
+	//convert Long substring to String data type
+		private static String convertToString(long dna) {
+			
+			String seq = Long.toString(dna,32);
+			return seq;
+		}
+		
 	
 
 }
