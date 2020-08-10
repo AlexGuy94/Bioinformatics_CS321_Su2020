@@ -1,3 +1,7 @@
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+
 /**
  * CS321: Bioinformatics Group Project
  * 
@@ -235,9 +239,10 @@ public class BTreeNode {
 	/**
 	 * reads a Node from file
 	 * Order: numKeys, location, parent pointer, leaf status, treeObjects(long key, int freq), childpointers
+	 * @throws IOException 
 	 *
 	 */
-    public void readNode(RandomAccessFile bTreeFile){
+    public void readNode(RandomAccessFile bTreeFile) throws IOException{
 	    ByteBuffer buffer = ByteBuffer.allocate(this.bytesInNode());
 	    bTreeFile.read(buffer.array());
 	   
@@ -246,18 +251,44 @@ public class BTreeNode {
 	    numKeys = buffer.getInt();
 	    loc = buffer.getInt();
 	    parent = buffer.getInt();
-	    leaf = buffer.get();
+	    leaf = (buffer.get()!=0);
 	    
 	    //for loops are somewhat inefficient having to iterate over unfilled nodes
 	    for(int i=0;i<treeObjects.length;i++){
 		    long key = buffer.getLong();
 		    int frequency = buffer.getInt();
-		    TreeObject treeObject = new TreeObject(key, frequency);
+		    BTreeObject treeObject = new BTreeObject(key);
 		    treeObjects[i] = treeObject;
-	    for(int 1=0;i<children.length;i++){
+	    }
+	    for(int i=0;i<children.length;i++){
 		    children[i] = buffer.getInt();
+		    
+		    
 	    
-	    
+	    }
 		
     }
+    
+    public void writeNode(RandomAccessFile bTreeFile) throws IOException {
+    	ByteBuffer buffer = ByteBuffer.allocate(bytesInNode());
+    	buffer.putInt(numKeys);
+	    buffer.putInt(loc);
+	    buffer.putInt(parent);
+	    buffer.put((byte)(leaf?1:0));
+	    for(int i=0;i<treeObjects.length;i++) {
+	    	buffer.putLong(treeObjects[i].getKey());
+	    	buffer.putInt(treeObjects[i].getFrequency());
+    }
+	    for(int i=0;i<children.length;i++){
+	    	 buffer.putInt(children[i]);
+	    }
+	    buffer.flip();
+	    bTreeFile.seek(loc);
+	    bTreeFile.write(buffer.array()); 
+    }
 }
+
+
+
+
+

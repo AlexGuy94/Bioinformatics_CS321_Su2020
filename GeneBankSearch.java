@@ -102,7 +102,7 @@ public class GeneBankSearch {
 			while(scanner.hasNext()) {
 				String dnaSequence = scanner.next();
 				long longSequence = convertToLong(dnaSequence);
-				int frequency = bTree.search(longSequence);
+				int frequency = bTree.BTreeSearch(bTree.getRoot(),longSequence);
 				System.out.println(dnaSequence + ": " + frequency);
 				if(debug==1) {
 					 writer.write(dnaSequence + ": " + frequency);
