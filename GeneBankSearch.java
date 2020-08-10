@@ -51,7 +51,7 @@ public class GeneBankSearch {
 			if (Integer.parseInt(args[3])>1) {
 				cacheSize = Integer.parseInt(args[3]);
 				c = new Cache(cacheSize);
-				
+			}
 			if (Integer.parseInt(args[4])==1) {
 				debug = 1;
 			} else {
@@ -132,7 +132,7 @@ public class GeneBankSearch {
 			
 		}
 	}
-	}
+	
 //convert DNA substring to Long data type
 	private static long convertToLong(String dna) {
 		dna = dna.toLowerCase();
