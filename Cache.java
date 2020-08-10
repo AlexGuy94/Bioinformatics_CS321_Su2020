@@ -1,7 +1,9 @@
 import java.util.LinkedList;
+
+import com.sun.org.apache.xml.internal.utils.ListingErrorHandler;
 public class Cache {
 
-	LinkedList<Object> list;
+	LinkedList<BTreeNode> list;
 	int len;
 	public int hitcount=0;
 	public int misscount=0;
@@ -15,7 +17,7 @@ public class Cache {
 	 */
 	public Cache(int length) {
 		len = length;
-		list = new LinkedList<Object>();
+		list = new LinkedList<BTreeNode>();
 	}
 
 	/**
@@ -24,7 +26,7 @@ public class Cache {
 	 * @param searchterm
 	 * @return
 	 */
-	public int findIndex(Object searchterm) {
+	public int findIndex(BTreeNode searchterm) {
 		int index = this.list.indexOf(searchterm);
 		System.out.println(searchterm);
 		if(index!=-1) {
@@ -38,6 +40,17 @@ public class Cache {
 			return index;
 		}
 
+	}
+	
+	public int findNode(int index) {
+		for(int i=0;i<list.size();i++) {
+			if(list.get(i).getLoc()==index) {
+				return i;
+			}
+			
+		}
+		return -1;
+		
 	}
 
 	/**
@@ -56,7 +69,7 @@ public class Cache {
 	 * 
 	 * @param obj
 	 */
-	public void addObject(Object obj) {
+	public void addObject(BTreeNode obj) {
 		list.addFirst(obj);
 		if(list.size() >= len) {
 			this.removeObject(len-1);
@@ -79,8 +92,8 @@ public class Cache {
 	 * 
 	 * @param index
 	 */
-	public Object removeObject(int index) {
-		Object obj = this.list.remove(index);
+	public BTreeNode removeObject(int index) {
+		BTreeNode obj = this.list.remove(index);
 		return obj;
 	}
 

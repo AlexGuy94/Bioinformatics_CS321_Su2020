@@ -47,7 +47,6 @@ public class BTree {
 	 * @throws IOException
 	 */
 	public BTreeNode readNode(int location) throws IOException {
-		
 		bTreeFile.seek(location);
 		BTreeNode node = new BTreeNode(degree);
 		node.readNode(bTreeFile);
@@ -85,6 +84,38 @@ public class BTree {
 			return 0;
 		} else {
 			node = readNode(node.getChild(i));
+			return BTreeSearch(node, key);
+		}
+	}
+	
+	/**
+	 * Overload Method for including a cache.
+	 * 
+	 * @param node
+	 * @param key
+	 * @param c
+	 * @return
+	 * @throws IOException
+	 */
+	public int BTreeSearch(BTreeNode node, long key, Cache c) throws IOException {
+		int i=0;
+		
+		while(i<node.getnumKeys() && key>node.getBTreeObject(i).getKey()) {
+			i++;
+		}
+		if (i<=node.getnumKeys() && key==node.getBTreeObject(i).getKey()) {
+			return node.getBTreeObject(i).getFrequency();
+		}
+		if(node.isLeaf()) {
+			return 0;
+		} else {
+			int cacheIndex = c.findNode(node.getChild(i));
+			if(cacheIndex>-1){
+				node = (BTreeNode) c.getObject(cacheIndex);
+			}else {
+			node = readNode(node.getChild(i));
+			
+			}
 			return BTreeSearch(node, key);
 		}
 	}

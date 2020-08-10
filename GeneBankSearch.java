@@ -13,6 +13,7 @@ public class GeneBankSearch {
 	private static String queryFileName = null;
 	private static int cacheSize = 0;
 	private static int debug = 0;
+	private static Cache c;
 
 	/**
 	 * @param args
@@ -43,10 +44,14 @@ public class GeneBankSearch {
 		if (cache == 1 && args.length==4){
 			if (Integer.parseInt(args[3])>0) 
 				cacheSize = Integer.parseInt(args[3]);
+				c = new Cache(cacheSize);
+				
 
 		} else if (cache == 1 && args.length==5) {
-			if (Integer.parseInt(args[3])>1) 
+			if (Integer.parseInt(args[3])>1) {
 				cacheSize = Integer.parseInt(args[3]);
+				c = new Cache(cacheSize);
+			}
 			if (Integer.parseInt(args[4])==1) {
 				debug = 1;
 			} else {
@@ -99,7 +104,12 @@ public class GeneBankSearch {
 			while(scanner.hasNext()) {
 				String dnaSequence = scanner.next();
 				long longSequence = convertToLong(dnaSequence);
+				if(cache==1) {
+					
+				}
+				
 				int frequency = bTree.BTreeSearch(bTree.getRoot(),longSequence);
+				
 				System.out.println(dnaSequence + ": " + frequency);
 				if(debug==1) {
 					 writer.write(dnaSequence + ": " + frequency);
