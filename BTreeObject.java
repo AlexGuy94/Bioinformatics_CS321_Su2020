@@ -22,7 +22,7 @@
 	}
 	
 	
-	public getFrequency(){
+	public int getFrequency(){
 		
 		return frequency;
 	}
