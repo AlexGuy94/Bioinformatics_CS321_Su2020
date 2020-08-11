@@ -16,10 +16,8 @@ public class BTreeNode {
 	// ============================================================
 	// Instance Variables
 	// ============================================================
-    
-	private int parent, numKeys, loc, degree; 
+    private int parent, numKeys, loc, degree; 
     private int[] children; 
-   // private BTreeNode[] nodes;//is this needed?  I think we should have nodes stored in the tree. The "children" pointers are pointing to the nodes.
     private BTreeObject[] treeObjects; 
     private boolean leaf;
 
@@ -32,7 +30,6 @@ public class BTreeNode {
 		this.setDegree(t);
 		this.parent = 0;
 		this.children = new int[2*t];
-		//this.nodes = new BTreeNode[2*t]; //suggest removing
 		this.treeObjects = new BTreeObject[2*t-1];
 		for (int i=0; i<treeObjects.length; i++) {
 			treeObjects[i] = new BTreeObject((long) (0));
@@ -128,23 +125,6 @@ public class BTreeNode {
 		this.treeObjects[i].setKey(key);
     }
 
-    
-    //consider removing...all keys should be stored in binary
-//	/**
-//	 * Gets condition of key from treeObject at given index.
-//	 *
-//	 */
-//    public int getNodeKeyCondition(int i) {
-//		return this.treeObjects[i].getKeyCondition();
-//    }
-//
-//	/**
-//	 * Sets conditon of key from treeObject at given index.
-//	 *
-//	 */
-//    public void setNodeKeyCondition(int i, int condition) {
-//		this.treeObjects[i].setKeyCondition(condition);
-//    }
 
 	/**
 	 * Gets frequency of treeObject at given index.
@@ -195,22 +175,6 @@ public class BTreeNode {
     }
 
     
-    //consider removing...I'm not sure what a treeNode is.  the child should just be an int pointer.
-//	/**
-//	 * Sets child node.
-//	 *
-//	 */
-//    public void setNode(int i, TreeNode child) {
-//		this.nodes[i] = child;
-//    }
-//
-//	/**
-//	 * gets child node at given index.
-//	 *
-//	 */
-//    public TreeNode getNode(int i) {
-//		return this.nodes[i];
-//    }
 
 	/**
 	 * Sets degree of node.
@@ -250,8 +214,6 @@ public class BTreeNode {
 	    ByteBuffer buffer = ByteBuffer.allocate(this.bytesInNode());
 	    bTreeFile.read(buffer.array());
 	   
-	    //check ordering on these.
-	    
 	    numKeys = buffer.getInt();
 	    loc = buffer.getInt();
 	    parent = buffer.getInt();
