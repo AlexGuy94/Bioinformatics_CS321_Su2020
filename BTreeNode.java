@@ -27,7 +27,7 @@ public class BTreeNode {
 	 * Default constructor
 	 * @param t - the minimum degree of the BTree
 	 */
-    public BTreeNode(int t) {
+    public BTreeNode(int t, int location) {
 	
 		this.setDegree(t);
 		this.parent = 0;
@@ -39,7 +39,7 @@ public class BTreeNode {
 		}
 		this.numKeys = 0;
 		this.leaf = true;
-		this.loc = 0; //suggest changing to 12, there are 12 bytes of metadata in the tree so the first node should start at position 12.
+		this.loc = location; 
     }
 
 

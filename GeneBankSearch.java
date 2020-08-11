@@ -85,7 +85,7 @@ public class GeneBankSearch {
 			int rootLocation = byteBuffer.getInt();
 			
 			//build a root node from bTreeFile, will need degree
-			BTreeNode rootNode = new BTreeNode(degree);
+			BTreeNode rootNode = new BTreeNode(degree, rootLocation);
 			//find the first byte of the Root Node
 			bTreeFile.seek(rootLocation);
 			
