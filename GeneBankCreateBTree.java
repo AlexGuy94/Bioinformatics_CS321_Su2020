@@ -1,6 +1,9 @@
 
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
+import java.util.Scanner;
 
 public class GeneBankCreateBTree {
 	private static int cacheLevel; //arg0
@@ -14,7 +17,8 @@ public class GeneBankCreateBTree {
 	private static int metaData = 40; // filler numbers
 	private static int pointerSize = 4; // filler numbers
 	private static int nodeSize = 40;  // filler numbers
-	
+	private static String strSequence, subSequence; // whole dna sequence string
+	private static String outputFileName, dumpFileName; 
 	
 	public static void main(String[] args) {
 		//checks for correct args lenght
@@ -45,12 +49,12 @@ public class GeneBankCreateBTree {
 			printUsage();
 		}
 		//sets cache size 
-		if (args.length == 4 || args.length ==5 ) {
+		if (args.length == 5 || args.length ==6 ) {
 			cacheSize = Integer.parseInt(args[4]);
 		}
 		
 		// writes a text file named dump if arg[5] = 1;
-		if (args.length == 5) {
+		if (args.length == 6) {
 			if (Integer.parseInt(args[5]) == 1 )
 				useDebug=true;
 		}
@@ -66,30 +70,103 @@ public class GeneBankCreateBTree {
 		
 		//Create the Btree
 		
-		String outputFileName = args[2] + ".btree.data." + sequenceLenght + "." + degree;
+		outputFileName = args[2] + ".btree.data." + sequenceLenght + "." + degree;
+		dumpFileName = args[2] + ".btree.data." + sequenceLenght + "." + degree;
 		
+		//
 		
-		
-		
-		
-		
+		parseFile(gbkFile);
+		System.out.println("done");
 			
 		
 	}
 	//function to dump tree with inorder traversal when debug = true 
-	public static void dumpTree() {
+	public static void dumpTree() throws FileNotFoundException {
+		PrintStream o =new PrintStream(new File(dumpFileName));
 		
+		//breaks the dna sequence into substrings of sequence lenght k 
+				subSequence = "";
+				for(int i =0; i<strSequence.length(); i++) {
+					for(int j= sequenceLenght; j< strSequence.length(); j++) {
+						if(!strSequence.substring(i,j).contains("n")){
+							subSequence += strSequence.substring(i,j);
+						}
+					}
+				}
+			
 	}
 	
 	
 	//parses the given file, ignores everything but the genome
-	public static void parseFile() {
+	public static void parseFile(File gbkFile) {
+ 		Scanner scan = null;
+		boolean startParse =false;
+		try {
+			scan = new Scanner(gbkFile);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 		
+		String line = "";
+		strSequence = "";
+		
+		//starts scanning the file for sequence start
+		while(scan.hasNextLine()) {
+				line = scan.nextLine();
+				if(line.contains("ORIGIN")) {
+					startParse=true;
+					break;
+				}	
+		}
+		if(startParse == false) {
+			System.out.println("Origin not Found");
+			System.exit(1);
+		}
+
+		// starts dna sequence
+		if(startParse == true) {
+			while(scan.hasNextLine()){
+				if(scan.hasNext("//"))
+					break;
+				strSequence += scan.next();
+				
+			}
+			strSequence = strSequence.replaceAll("\\d", "");
+			strSequence = strSequence.toLowerCase();
+		}
+		
+		//breaks the dna sequence into substrings of sequence lenght k 
+		subSequence = "";
+		for(int i =0; i<strSequence.length(); i++) {
+			for(int j= sequenceLenght; j< strSequence.length(); j++) {
+				if(!strSequence.substring(i,j).contains("n")){
+					subSequence += strSequence.substring(i,j);
+				}
+			}
+		}
+		
+		
+		
+	}
+		
+	public static long encodeLong(String sequence) {
+		String s = sequence;
+	      s = s.replaceAll("a","00");
+	      s = s.replaceAll("t","11");
+	      s = s.replaceAll("c","01");
+	      s = s.replaceAll("g","10");
+	      Long m = 1l;
+	      m = m<<63; 
+	      return (Long.parseLong(s,2) | m);
 	}
 	
 	public static void printUsage() {
-		
+		System.out.println("java GeneBankCreateBTree <0/1(no/with Cache)> <degree> <gbk file> <sequence length>\r\n" + 
+				"[<cache size>] [<debug level>]");
 	}
+	
+	
+	
 	
 	//convert DNA substring to Long data type
 		private static long convertToLong(String dna) {
