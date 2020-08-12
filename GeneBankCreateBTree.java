@@ -149,25 +149,27 @@ public class GeneBankCreateBTree {
 		bTreeFile.close();
 		int i=0;
 		int j=sequenceLength;
+		
 		while(i<strSequence.length()&&j<strSequence.length()) {
+			int frequency=0;
 			if(!strSequence.substring(i,j).contains("n")){
 				subSequence = strSequence.substring(i,j);
 				//testing outputs
-				int frequency=0;
-				BTreeObject tree = bTree.BTreeFrequencySearch(bTree.getRoot(), convertToLong(subSequence));
-					if (tree==null) {
+				
+				BTreeObject object = bTree.BTreeFrequencySearch(bTree.getRoot(), convertToLong(subSequence));
+					if (object==null) {
 					bTree.insert(convertToLong(subSequence)); 
 					frequency = 1;
 				} else {
-					frequency= tree.getFrequency();
+					frequency= object.getFrequency();
 				}
 					
 					
-				System.out.println(subSequence +": " + frequency+": "+ i);
-				i++;
-				j++;
+				
 			}
-			
+			System.out.println(subSequence +": " + frequency+": "+ i);
+			i++;
+			j++;
 		}
 		bTree.writeMeta();
 //		for(int i =0; i<strSequence.length(); i++) {

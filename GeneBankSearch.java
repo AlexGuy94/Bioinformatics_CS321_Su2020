@@ -110,7 +110,11 @@ public class GeneBankSearch {
 					frequency = object.getFrequency();
 				} else {
 					BTreeObject object = bTree.BTreeSearch(bTree.getRoot(),longSequence);
+					if (object == null) {
+						frequency = 0;
+					}else {
 					frequency = object.getFrequency();
+					}
 				}
 				System.out.println(dnaSequence + ": " + frequency);
 				if(debug==1) {

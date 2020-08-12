@@ -24,7 +24,7 @@ public class BTree {
 		root.setnumKeys(0);
 		root.setLeaf(true);
 		this.length = length;
-		this.writeMeta();
+		//this.writeMeta();
 		this.writeNode(root);
 		
 	}
@@ -108,6 +108,9 @@ public class BTree {
 		}
 		if (i<node.getnumKeys() && key==node.getBTreeObject(i).getKey()) {
 			node.getBTreeObject(i).setFrequency(node.getBTreeObject(i).getFrequency()+1); //update frequency
+			RandomAccessFile bTreeFile = new RandomAccessFile(fileName,"rw");
+			node.writeNode(bTreeFile);
+			bTreeFile.close();
 			return node.getBTreeObject(i);
 		}
 		if(node.isLeaf()) {
@@ -258,6 +261,30 @@ public class BTree {
 		bTreeFile.write(buffer.array());
 		buffer.clear();
 		bTreeFile.close();
+	}
+	
+	public void inorderTraversalPrint() {
+		
+		if(root!=null) {
+		
+		}
+	}
+	
+	public void NodePrint(BTreeNode node) throws IOException {
+		int i=0;
+		for (i=0; i<node.getnumKeys();i++) {
+			if(!node.isLeaf()) {
+				NodePrint(readNode(node.getChild(i)));
+			}
+			System.out.println(convertToString(node.getBTreeObject(i).getKey())+": "+node.getBTreeObject(i).getFrequency());
+		}
+	}
+	//convert Long substring to String data type
+		private static String convertToString(long dna) {
+			
+			String seq = Long.toString(dna,32);
+			return seq;
+		
 	}
 }
 
