@@ -7,7 +7,7 @@ public class BTree {
 	private int degree,length;
 	private BTreeNode root;
 	private RandomAccessFile bTreeFile;
-	
+	private String fileName;
 	
 	
 	/**
@@ -17,15 +17,16 @@ public class BTree {
 	 * @param bTreeFile
 	 * @throws IOException 
 	 */
-	public BTree(int degree,int length, RandomAccessFile bTreeFile) throws IOException {
+	public BTree(int degree,int length, String fileName) throws IOException {
+		this.fileName = fileName;
 		this.degree = degree;
 		root = new BTreeNode(degree, 12);
 		root.setnumKeys(0);
 		root.setLeaf(true);
-		this.bTreeFile = bTreeFile;
 		this.length = length;
 		this.writeMeta();
 		this.writeNode(root);
+		
 	}
 	
 	/**
@@ -55,9 +56,11 @@ public class BTree {
 	 * @throws IOException
 	 */
 	public BTreeNode readNode(int location) throws IOException {
+		bTreeFile = new RandomAccessFile(fileName, "r");
 		bTreeFile.seek(location);
 		BTreeNode node = new BTreeNode(degree, location);
 		node.readNode(bTreeFile);
+		bTreeFile.close();
 		return node;
 	}
 	
@@ -67,8 +70,9 @@ public class BTree {
 	 * @throws IOException
 	 */
 	public void writeNode(BTreeNode node) throws IOException {
-		bTreeFile.seek(node.getLoc());
+		bTreeFile = new RandomAccessFile(fileName, "rw");
 		node.writeNode(bTreeFile);
+		bTreeFile.close();
 	}
 	
 	
@@ -80,37 +84,37 @@ public class BTree {
 	 * @return
 	 * @throws IOException
 	 */
-	public int BTreeSearch(BTreeNode node, long key) throws IOException {
+	public BTreeObject BTreeSearch(BTreeNode node, long key) throws IOException {
 		int i=0;
 		while(i<node.getnumKeys() && key>node.getBTreeObject(i).getKey()) {
 			i++;
 		}
 		if (i<node.getnumKeys() && key==node.getBTreeObject(i).getKey()) {
-			return node.getBTreeObject(i).getFrequency();
+			return node.getBTreeObject(i);
 		}
 		if(node.isLeaf()) {
-			return 0;
+			return null;
 		} else {
-			node = readNode(node.getChild(i));
-			return BTreeSearch(node, key);
+			BTreeNode newNode = readNode(node.getChild(i));
+			return BTreeSearch(newNode, key);
 		}
 	}
 	
 	
-	public int BTreeFrequencySearch(BTreeNode node, long key) throws IOException {
+	public BTreeObject BTreeFrequencySearch(BTreeNode node, long key) throws IOException {
 		int i=0;
 		while(i<node.getnumKeys() && key>node.getBTreeObject(i).getKey()) {
 			i++;
 		}
 		if (i<node.getnumKeys() && key==node.getBTreeObject(i).getKey()) {
 			node.getBTreeObject(i).setFrequency(node.getBTreeObject(i).getFrequency()+1); //update frequency
-			return node.getBTreeObject(i).getFrequency();
+			return node.getBTreeObject(i);
 		}
 		if(node.isLeaf()) {
-			return 0;
+			return null;
 		} else {
-			node = readNode(node.getChild(i));
-			return BTreeSearch(node, key);
+			BTreeNode newNode = readNode(node.getChild(i));
+			return BTreeFrequencySearch(newNode, key);
 		}
 	}
 	
@@ -123,17 +127,17 @@ public class BTree {
 	 * @return
 	 * @throws IOException
 	 */
-	public int BTreeSearch(BTreeNode node, long key, Cache c) throws IOException {
+	public BTreeObject BTreeSearch(BTreeNode node, long key, Cache c) throws IOException {
 		int i=1;
 		
 		while(i<node.getnumKeys() && key>node.getBTreeObject(i).getKey()) {
 			i++;
 		}
 		if (i<=node.getnumKeys() && key==node.getBTreeObject(i).getKey()) {
-			return node.getBTreeObject(i).getFrequency();
+			return node.getBTreeObject(i);
 		}
 		if(node.isLeaf()) {
-			return 0;
+			return null;
 		} else {
 			int cacheIndex = c.findNode(node.getChild(i));
 			if(cacheIndex>-1){
@@ -142,7 +146,7 @@ public class BTree {
 			node = readNode(node.getChild(i));
 			c.addObject(node);
 			}
-			return BTreeSearch(node, key);
+			return BTreeSearch(node, key, c);
 		}
 	}
 	
@@ -150,7 +154,9 @@ public class BTree {
 	
 	//Split-Child
 	private void childSplit(BTreeNode parentNode, int index, BTreeNode childNode) throws IOException {
+		bTreeFile = new RandomAccessFile(fileName, "r");
 		int newNodeLocation = (int) bTreeFile.length();
+		bTreeFile.close();
 		BTreeNode newChildNode = new BTreeNode(degree, newNodeLocation);
 		newChildNode.setLeaf(childNode.isLeaf());
 		newChildNode.setParent(parentNode.getLoc());
@@ -160,14 +166,14 @@ public class BTree {
 		}
 		if (!childNode.isLeaf()) {
 			for(int j=0;j<degree-1;j++) {
-				newChildNode.setChildPointer(j, childNode.getChild(j+degree-1));
+				newChildNode.setChildPointer(j, childNode.getChild(j+degree));
 			}
 		}
 		childNode.setnumKeys(degree-1);
 		for(int j=parentNode.getnumKeys()+1;j>=index+1;j--) {
 			parentNode.setChildPointer(j, parentNode.getChild(j-1));	
 		}
-		parentNode.setChildPointer(index, newChildNode.getLoc());
+		parentNode.setChildPointer(index+1, newChildNode.getLoc());
 		for(int j=parentNode.getnumKeys();j>=index+1;j--) {
 			parentNode.setTreeKey(j, parentNode.getBTreeObject(j-1).getKey());
 		}
@@ -183,10 +189,11 @@ public class BTree {
 	
 	//Insert
 	public void insert(long key) throws IOException {
-	
+		bTreeFile = new RandomAccessFile(fileName, "r");
 		BTreeNode r = this.getRoot();
 		if(r.getnumKeys()==2*degree-1) {
 			int newNodeLocation = (int) bTreeFile.length();
+			bTreeFile.close();
 			BTreeNode newNode = new BTreeNode(degree, newNodeLocation);
 			writeNode(newNode);
 			this.setRoot(newNode);
@@ -207,8 +214,8 @@ public class BTree {
 	private void insertNonFull(BTreeNode node, long key) throws IOException {
 		int i = node.getnumKeys();
 		if (node.isLeaf()) {
-			while(i>=1 && key<node.getBTreeObject(i).getKey()) {
-				node.setTreeKey(i, node.getBTreeObject(i).getKey());
+			while(i>=1 && key<node.getBTreeObject(i-1).getKey()) {
+				node.setTreeKey(i, node.getBTreeObject(i-1).getKey());
 				i--;
 			}
 			node.setTreeKey(i, key);
@@ -234,6 +241,7 @@ public class BTree {
 		
 	}
 	public void writeMeta() throws IOException {
+		bTreeFile = new RandomAccessFile(this.fileName, "rw");
 		ByteBuffer buffer = ByteBuffer.allocate(12);
 		buffer.putInt(degree);
 		buffer.putInt(length);
@@ -242,6 +250,7 @@ public class BTree {
 		bTreeFile.seek(0);
 		bTreeFile.write(buffer.array());
 		buffer.clear();
+		bTreeFile.close();
 	}
 }
 

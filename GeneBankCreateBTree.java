@@ -142,25 +142,31 @@ public class GeneBankCreateBTree {
 		//breaks the dna sequence into substrings of sequence lenght k 
 		subSequence = "";
 		
-		RandomAccessFile BTreeFile = new RandomAccessFile("bTreeTest", "rw");
-		BTree bTree = new BTree(degree,sequenceLength, BTreeFile);
+		
+		BTree bTree = new BTree(degree,sequenceLength,outputFileName);
 		int i=0;
 		int j=sequenceLength;
 		while(i<strSequence.length()&&j<strSequence.length()) {
 			if(!strSequence.substring(i,j).contains("n")){
 				subSequence = strSequence.substring(i,j);
 				//testing outputs
-				System.out.println(subSequence +": " + i);
-				if(bTree.BTreeFrequencySearch(bTree.getRoot(), convertToLong(subSequence))==0){
-					//Inserts sequences into bTree and outputs bTreeTest.  It's buggy though, only works for t>11
-					bTree.insert(convertToLong(subSequence));
+				int frequency=0;
+				BTreeObject tree = bTree.BTreeFrequencySearch(bTree.getRoot(), convertToLong(subSequence));
+					if (tree==null) {
+					bTree.insert(convertToLong(subSequence)); 
+					frequency = 1;
+				} else {
+					frequency= tree.getFrequency();
 				}
-				
+					
+					
+				System.out.println(subSequence +": " + frequency+": "+ i);
 				i++;
 				j++;
 			}
-			bTree.writeMeta();
+			
 		}
+		bTree.writeMeta();
 //		for(int i =0; i<strSequence.length(); i++) {
 //			for(int j= sequenceLength; j< strSequence.length(); j++) {
 //				if(!strSequence.substring(i,j).contains("n")){

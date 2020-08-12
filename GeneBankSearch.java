@@ -92,7 +92,7 @@ public class GeneBankSearch {
 			rootNode.readNode(bTreeFile);
 			
 			//Make a BTree
-			BTree bTree = new BTree(degree,sequenceLength, bTreeFile);
+			BTree bTree = new BTree(degree,sequenceLength, bTreeFileName);
 			bTree.setRoot(rootNode);
 			
 			//Search for DNA subsequences in BTree and write to file
@@ -102,17 +102,16 @@ public class GeneBankSearch {
 			
 			//scan for subsequence and write to dump file and or print to console
 			while(scanner.hasNext()) {
-				String dnaSequence = scanner.next();
+				String dnaSequence = scanner.next().toLowerCase();
 				long longSequence = convertToLong(dnaSequence);
 				int frequency = 0;
 				if(cache==1) {
-					frequency = bTree.BTreeSearch(bTree.getRoot(),longSequence,c);
-					
+					BTreeObject object = bTree.BTreeSearch(bTree.getRoot(),longSequence,c);
+					frequency = object.getFrequency();
 				} else {
-				
-					frequency = bTree.BTreeSearch(bTree.getRoot(),longSequence);
+					BTreeObject object = bTree.BTreeSearch(bTree.getRoot(),longSequence);
+					frequency = object.getFrequency();
 				}
-				
 				System.out.println(dnaSequence + ": " + frequency);
 				if(debug==1) {
 					 writer.write(dnaSequence + ": " + frequency);

@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 /**
  * CS321: Bioinformatics Group Project
@@ -107,6 +108,7 @@ public class BTreeNode {
 	 */
     public void setnumKeys(int numKeys) {
 		this.numKeys = numKeys;
+		
     }
 
 	/**
@@ -211,10 +213,11 @@ public class BTreeNode {
 	 *
 	 */
     public void readNode(RandomAccessFile bTreeFile) throws IOException{
+    	
 	    ByteBuffer buffer = ByteBuffer.allocate(this.bytesInNode());
 	    bTreeFile.read(buffer.array());
-	   
 	    numKeys = buffer.getInt();
+	    //System.out.println(numKeys);
 	    loc = buffer.getInt();
 	    parent = buffer.getInt();
 	    leaf = (buffer.get()!=0);
@@ -228,10 +231,13 @@ public class BTreeNode {
 	    for(int i=0;i<children.length;i++){
 		    children[i] = buffer.getInt();
 	    }
+	    buffer.clear();
     }
     public void writeNode(RandomAccessFile bTreeFile) throws IOException {
     	ByteBuffer buffer = ByteBuffer.allocate(bytesInNode());
+    	buffer.clear();
     	buffer.putInt(numKeys);
+    	//System.out.println(numKeys);
 	    buffer.putInt(loc);
 	    buffer.putInt(parent);
 	    buffer.put((byte)(leaf?1:0));
@@ -245,6 +251,7 @@ public class BTreeNode {
 	    buffer.flip();
 	    bTreeFile.seek(loc);
 	    bTreeFile.write(buffer.array()); 
+	    buffer.clear();
     }
 }
 
