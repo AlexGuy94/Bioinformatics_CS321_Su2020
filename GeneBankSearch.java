@@ -72,7 +72,7 @@ public class GeneBankSearch {
 		// Add Files to be read and extract metadata
 		
 		try {
-			RandomAccessFile bTreeFile = new RandomAccessFile(bTreeFileName, "r");
+			RandomAccessFile bTreeFile = new RandomAccessFile(bTreeFileName, "rw");
 			FileInputStream queryFile = new FileInputStream(queryFileName);
 
 			ByteBuffer byteBuffer = ByteBuffer.allocate(12);
@@ -80,10 +80,9 @@ public class GeneBankSearch {
 			
 			//adjust order of metadata inputs if necessary 
 			int degree = byteBuffer.getInt();
-			@SuppressWarnings("unused")
 			int sequenceLength = byteBuffer.getInt();
 			int rootLocation = byteBuffer.getInt();
-			
+			System.out.println(degree+" "+sequenceLength+" "+rootLocation);
 			//build a root node from bTreeFile, will need degree
 			BTreeNode rootNode = new BTreeNode(degree, rootLocation);
 			//find the first byte of the Root Node
@@ -93,7 +92,7 @@ public class GeneBankSearch {
 			rootNode.readNode(bTreeFile);
 			
 			//Make a BTree
-			BTree bTree = new BTree(degree, bTreeFile);
+			BTree bTree = new BTree(degree,sequenceLength, bTreeFile);
 			bTree.setRoot(rootNode);
 			
 			//Search for DNA subsequences in BTree and write to file

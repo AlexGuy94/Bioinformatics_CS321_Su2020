@@ -219,7 +219,6 @@ public class BTreeNode {
 	    parent = buffer.getInt();
 	    leaf = (buffer.get()!=0);
 	    
-	    //for loops are somewhat inefficient having to iterate over unfilled nodes
 	    for(int i=0;i<treeObjects.length;i++){
 		    long key = buffer.getLong();
 		    int frequency = buffer.getInt(); 

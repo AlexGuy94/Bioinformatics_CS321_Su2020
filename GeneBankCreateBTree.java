@@ -2,14 +2,17 @@
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintStream;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 import java.util.Scanner;
 
 public class GeneBankCreateBTree {
 	private static int cacheLevel; //arg0
 	private static int degree;		//arg1
 	private static File gbkFile;		//arg2
-	private static int sequenceLenght;	//arg3
+	private static int sequenceLength;	//arg3
 	private static int cacheSize;		//arg4
 	private static int debugLevel;		//arg5
 	private static boolean useDebug, useCache = false;
@@ -19,8 +22,9 @@ public class GeneBankCreateBTree {
 	private static int nodeSize = 40;  // filler numbers
 	private static String strSequence, subSequence; // whole dna sequence string
 	private static String outputFileName, dumpFileName; 
+	private static BTree bTree = null;
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		//checks for correct args lenght
 		try {
 			
@@ -43,8 +47,8 @@ public class GeneBankCreateBTree {
 		
 		
 		//checks to make sure sequence lenght is correct
-		sequenceLenght = Integer.parseInt(args[3]);
-		if(sequenceLenght>31 || sequenceLenght <1) {
+		sequenceLength = Integer.parseInt(args[3]);
+		if(sequenceLength>31 || sequenceLength <1) {
 			System.err.println("Wrong sequence lenght");
 			printUsage();
 		}
@@ -70,8 +74,8 @@ public class GeneBankCreateBTree {
 		
 		//Create the Btree
 		
-		outputFileName = args[2] + ".btree.data." + sequenceLenght + "." + degree;
-		dumpFileName = args[2] + ".btree.data." + sequenceLenght + "." + degree;
+		outputFileName = args[2] + ".btree.data." + sequenceLength + "." + degree;
+		dumpFileName = args[2] + ".btree.data." + sequenceLength + "." + degree;
 		
 		//
 		
@@ -87,7 +91,7 @@ public class GeneBankCreateBTree {
 		//breaks the dna sequence into substrings of sequence lenght k 
 				subSequence = "";
 				for(int i =0; i<strSequence.length(); i++) {
-					for(int j= sequenceLenght; j< strSequence.length(); j++) {
+					for(int j= sequenceLength; j< strSequence.length(); j++) {
 						if(!strSequence.substring(i,j).contains("n")){
 							subSequence += strSequence.substring(i,j);
 						}
@@ -98,7 +102,7 @@ public class GeneBankCreateBTree {
 	
 	
 	//parses the given file, ignores everything but the genome
-	public static void parseFile(File gbkFile) {
+	public static void parseFile(File gbkFile) throws IOException {
  		Scanner scan = null;
 		boolean startParse =false;
 		try {
@@ -137,18 +141,47 @@ public class GeneBankCreateBTree {
 		
 		//breaks the dna sequence into substrings of sequence lenght k 
 		subSequence = "";
-		for(int i =0; i<strSequence.length(); i++) {
-			for(int j= sequenceLenght; j< strSequence.length(); j++) {
-				if(!strSequence.substring(i,j).contains("n")){
-					subSequence += strSequence.substring(i,j);
+		
+		RandomAccessFile BTreeFile = new RandomAccessFile("bTreeTest", "rw");
+		BTree bTree = new BTree(degree,sequenceLength, BTreeFile);
+		int i=0;
+		int j=sequenceLength;
+		while(i<strSequence.length()&&j<strSequence.length()) {
+			if(!strSequence.substring(i,j).contains("n")){
+				subSequence = strSequence.substring(i,j);
+				//testing outputs
+				System.out.println(subSequence +": " + i);
+				if(bTree.BTreeFrequencySearch(bTree.getRoot(), convertToLong(subSequence))==0){
+					//Inserts sequences into bTree and outputs bTreeTest.  It's buggy though, only works for t>11
+					bTree.insert(convertToLong(subSequence));
 				}
+				
+				i++;
+				j++;
 			}
+			bTree.writeMeta();
 		}
+//		for(int i =0; i<strSequence.length(); i++) {
+//			for(int j= sequenceLength; j< strSequence.length(); j++) {
+//				if(!strSequence.substring(i,j).contains("n")){
+//					subSequence = strSequence.substring(i,j);
+//					System.out.println(subSequence);
+//				}
+//			}
+//		}
+		
+		
 		
 		
 		
 	}
-		
+	
+	public static void insertIntoBTree(BTree tree, String sub) throws IOException {
+		long key = convertToLong(sub);
+		tree.insert(key);
+	}
+	
+	
 	public static long encodeLong(String sequence) {
 		String s = sequence;
 	      s = s.replaceAll("a","00");
