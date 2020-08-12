@@ -114,6 +114,10 @@ public class BTree {
 			return null;
 		} else {
 			BTreeNode newNode = readNode(node.getChild(i));
+			if(newNode.getLoc()==0) {
+				return null;
+			}
+
 			return BTreeFrequencySearch(newNode, key);
 		}
 	}
@@ -167,7 +171,7 @@ public class BTree {
 			//childNode.setTreefrequency(j+degree, 1);
 		}
 		if (!childNode.isLeaf()) {
-			for(int j=0;j<degree-1;j++) {
+			for(int j=0;j<degree;j++) {
 				newChildNode.setChildPointer(j, childNode.getChild(j+degree));
 				//childNode.setChildPointer(j+degree, 0);
 			}
