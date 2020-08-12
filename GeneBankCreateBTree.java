@@ -144,6 +144,9 @@ public class GeneBankCreateBTree {
 		
 		
 		BTree bTree = new BTree(degree,sequenceLength,outputFileName);
+		RandomAccessFile bTreeFile = new RandomAccessFile(outputFileName, "rw");
+		bTreeFile.setLength(0);
+		bTreeFile.close();
 		int i=0;
 		int j=sequenceLength;
 		while(i<strSequence.length()&&j<strSequence.length()) {

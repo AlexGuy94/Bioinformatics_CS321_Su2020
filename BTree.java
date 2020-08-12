@@ -163,10 +163,13 @@ public class BTree {
 		newChildNode.setnumKeys(degree-1);
 		for (int j=0;j<degree-1;j++) {
 			newChildNode.setTreeObject(j, childNode.getBTreeObject(j+degree));
+			//childNode.setTreeKey(j+degree, 0);
+			//childNode.setTreefrequency(j+degree, 1);
 		}
 		if (!childNode.isLeaf()) {
 			for(int j=0;j<degree-1;j++) {
 				newChildNode.setChildPointer(j, childNode.getChild(j+degree));
+				//childNode.setChildPointer(j+degree, 0);
 			}
 		}
 		childNode.setnumKeys(degree-1);
@@ -175,7 +178,7 @@ public class BTree {
 		}
 		parentNode.setChildPointer(index+1, newChildNode.getLoc());
 		for(int j=parentNode.getnumKeys();j>=index+1;j--) {
-			parentNode.setTreeKey(j, parentNode.getBTreeObject(j-1).getKey());
+			parentNode.setTreeObject(j, parentNode.getBTreeObject(j-1));
 		}
 		parentNode.setTreeObject(index, childNode.getBTreeObject(degree-1));
 		parentNode.setnumKeys(parentNode.getnumKeys()+1);
