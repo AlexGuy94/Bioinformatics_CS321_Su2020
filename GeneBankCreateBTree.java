@@ -79,7 +79,8 @@ public class GeneBankCreateBTree {
 		
 		//
 		
-		parseFile(gbkFile);
+		String sequence = parseFile(gbkFile);
+		insertIntoBTree(sequence);
 		System.out.println("done");
 			
 		
@@ -102,7 +103,7 @@ public class GeneBankCreateBTree {
 	
 	
 	//parses the given file, ignores everything but the genome
-	public static void parseFile(File gbkFile) throws IOException {
+	public static String parseFile(File gbkFile) throws IOException {
  		Scanner scan = null;
 		boolean startParse =false;
 		try {
@@ -138,8 +139,13 @@ public class GeneBankCreateBTree {
 			strSequence = strSequence.replaceAll("\\d", "");
 			strSequence = strSequence.toLowerCase();
 		}
+		return strSequence;
+	}
 		
 		//breaks the dna sequence into substrings of sequence lenght k 
+		
+		public static void insertIntoBTree(String strSequence) throws IOException {
+			
 		subSequence = "";
 		
 		
@@ -167,11 +173,13 @@ public class GeneBankCreateBTree {
 					
 				
 			}
-			System.out.println(subSequence +": " + frequency+": "+ i);
+			//System.out.println(subSequence +": " + frequency+": "+ i);
 			i++;
 			j++;
 		}
 		bTree.writeMeta();
+		bTree.inorderTraversalPrint();
+		}
 //		for(int i =0; i<strSequence.length(); i++) {
 //			for(int j= sequenceLength; j< strSequence.length(); j++) {
 //				if(!strSequence.substring(i,j).contains("n")){
@@ -180,12 +188,6 @@ public class GeneBankCreateBTree {
 //				}
 //			}
 //		}
-		
-		
-		
-		
-		
-	}
 	
 	public static void insertIntoBTree(BTree tree, String sub) throws IOException {
 		long key = convertToLong(sub);

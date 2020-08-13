@@ -263,10 +263,10 @@ public class BTree {
 		bTreeFile.close();
 	}
 	
-	public void inorderTraversalPrint() {
+	public void inorderTraversalPrint() throws IOException {
 		
 		if(root!=null) {
-		
+			NodePrint(root);
 		}
 	}
 	
