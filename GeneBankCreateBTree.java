@@ -117,7 +117,7 @@ public class GeneBankCreateBTree {
 		//starts scanning the file for sequence start
 		while(scan.hasNextLine()) {
 				line = scan.nextLine();
-				if(line.contains("ORIGIN")) {
+				if(line.contains("ORIGIN")) {   //NEED TO READ THROUGH CHECKING FOR MULTIPLE NUMBER OF i "ORINGIN"'S THEN LOOP THE PARSING SEQUENCE i TIMES.
 					startParse=true;
 					break;
 				}	

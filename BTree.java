@@ -278,6 +278,9 @@ public class BTree {
 			}
 			System.out.println(convertToString(node.getBTreeObject(i).getKey())+": "+node.getBTreeObject(i).getFrequency());
 		}
+		if(!node.isLeaf()) {
+			NodePrint(readNode(node.getChild(i)));
+		}
 	}
 	//convert Long substring to String data type
 		private static String convertToString(long dna) {
