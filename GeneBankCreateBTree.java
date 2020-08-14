@@ -114,31 +114,35 @@ public class GeneBankCreateBTree {
 		String line = "";
 		strSequence = "";
 		
-		//starts scanning the file for sequence start
-		while(scan.hasNextLine()) {
-				line = scan.nextLine();
-				if(line.contains("ORIGIN")) {   //NEED TO READ THROUGH CHECKING FOR MULTIPLE NUMBER OF i "ORINGIN"'S THEN LOOP THE PARSING SEQUENCE i TIMES.
-					startParse=true;
-					break;
-				}	
-		}
-		if(startParse == false) {
-			System.out.println("Origin not Found");
-			System.exit(1);
-		}
-
-		// starts dna sequence
-		if(startParse == true) {
-			while(scan.hasNextLine()){
-				if(scan.hasNext("//"))
-					break;
-				strSequence += scan.next();
-				
-			}
-			strSequence = strSequence.replaceAll("\\d", "");
-			strSequence = strSequence.toLowerCase();
-		}
 		
+		//scans the entire text file until the end
+		while (scan.hasNext()) {
+			//starts scanning the file for sequence start ie ORIGIN
+			while (scan.hasNextLine()) {
+				line = scan.nextLine();
+				if (line.contains("ORIGIN")) { //NEED TO READ THROUGH CHECKING FOR MULTIPLE NUMBER OF i "ORINGIN"'S THEN LOOP THE PARSING SEQUENCE i TIMES.
+					startParse = true;
+					break;
+				} else {
+					continue;
+				}
+			}
+			// starts dna sequence
+			if (startParse == true) {
+				while (scan.hasNextLine()) {
+					if (scan.hasNext("//"))
+						break;
+					strSequence += scan.next();
+
+				}
+				strSequence = strSequence.replaceAll("\\d", "");
+				strSequence = strSequence.toLowerCase();
+				//using n to signify a break between multiple ORIGINS
+				strSequence += "n";
+				startParse = false;
+				line= "";
+			} 
+		}
 		//breaks the dna sequence into substrings of sequence lenght k 
 		subSequence = "";
 		
@@ -172,19 +176,7 @@ public class GeneBankCreateBTree {
 			j++;
 		}
 		bTree.writeMeta();
-//		for(int i =0; i<strSequence.length(); i++) {
-//			for(int j= sequenceLength; j< strSequence.length(); j++) {
-//				if(!strSequence.substring(i,j).contains("n")){
-//					subSequence = strSequence.substring(i,j);
-//					System.out.println(subSequence);
-//				}
-//			}
-//		}
-		
-		
-		
-		
-		
+
 	}
 	
 	public static void insertIntoBTree(BTree tree, String sub) throws IOException {
