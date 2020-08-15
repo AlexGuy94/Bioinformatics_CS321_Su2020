@@ -1,3 +1,6 @@
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
@@ -263,14 +266,56 @@ public class BTree {
 		bTreeFile.close();
 	}
 	
-	public void inorderTraversalPrint() {
+	//method to be called by main to print dump file
+	public  void inorderTraversalPrint(String outPutName, int seqLength) throws IOException {
+		File dumpFile = new File(outPutName);
+		FileWriter fileWriter = new FileWriter(dumpFile);
 		
-		if(root!=null) {
-		
-		}
+		printNodes(root, fileWriter, seqLength);
+		fileWriter.close();
+	
 	}
 	
-	public void NodePrint(BTreeNode node) throws IOException {
+	// method to traverse the tree 
+	private void printNodes(BTreeNode node, FileWriter fileWriter, int seqLength) {
+		
+		int objects = node.getNumObjects();
+		int value = seqLength;
+
+		for (int i = 0; i < node.getnumKeys(); i++) {
+			try {
+				printNodes(readNode(i), fileWriter, value);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				System.out.println("error on recursive call");
+				e1.printStackTrace();
+			}
+
+			if (objects >= i) {
+				String string = convertToString(node.getBTreeObject(i).getKey())+": "+node.getBTreeObject(i).getFrequency();
+				try {
+					fileWriter.write(string + "\n");
+				} catch (IOException e) {
+					System.out.println("error on 2nd block");
+					e.printStackTrace();
+				}
+			}	
+		}
+		if (node.isLeaf()) {
+
+			for (int j = 1; j <= objects; j++) {
+				String string = convertToString(node.getBTreeObject(j).getKey())+": "+node.getBTreeObject(j).getFrequency();
+				try {
+					fileWriter.write(string + "\n");
+				} catch (IOException e) {
+					System.out.println("error on 3rd block");
+					e.printStackTrace();
+				}
+			}
+		}	
+	}
+	
+	public void NodePrint(BTreeNode node ) throws IOException {
 		int i=0;
 		for (i=0; i<node.getnumKeys();i++) {
 			if(!node.isLeaf()) {
