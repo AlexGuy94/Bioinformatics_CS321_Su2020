@@ -61,6 +61,7 @@ public class GeneBankCreateBTree {
 		}
 		
 		// writes a text file named dump if arg[5] = 1;
+	
 		if (args.length == 6) {
 			if (Integer.parseInt(args[5]) == 1 )
 				useDebug=true;
@@ -78,16 +79,14 @@ public class GeneBankCreateBTree {
 		//Create the Btree
 		
 		outputFileName = args[2] + ".btree.data." + sequenceLength + "." + degree;
-		dumpFileName = args[2] + ".btree.data." + sequenceLength + "." + degree + ".txt";
+		dumpFileName = args[2] + ".btree.dump." + sequenceLength +".txt";
 		String dumpName =dumpFileName;
 		int printLength = sequenceLength;
-		//
 		
-//<<<<<<< HEAD
 		String sequence = parseFile(gbkFile);
 		insertIntoBTree(sequence);
-//=======
-		parseFile(gbkFile);
+
+		//parseFile(gbkFile);
 		
 		//prints out the dump file when debug = 1 = true;
 		
@@ -98,7 +97,6 @@ public class GeneBankCreateBTree {
 			
 			
 		}
-//>>>>>>> 5964a6fda3c64ebd9b56dc87c344f395c1a1947c
 		System.out.println("done");
 			
 		
@@ -175,7 +173,7 @@ public class GeneBankCreateBTree {
 		subSequence = "";
 		
 		
-		BTree bTree = new BTree(degree,sequenceLength,outputFileName);
+		bTree = new BTree(degree,sequenceLength,outputFileName);
 		RandomAccessFile bTreeFile = new RandomAccessFile(outputFileName, "rw");
 		bTreeFile.setLength(0);
 		bTreeFile.close();
@@ -196,15 +194,12 @@ public class GeneBankCreateBTree {
 					frequency= object.getFrequency();
 				}
 					
-					
-				
 			}
 			//System.out.println(subSequence +": " + frequency+": "+ i);
 			i++;
 			j++;
 		}
 		bTree.writeMeta();
-//<<<<<<< HEAD
 		bTree.inorderTraversalPrint();
 		}
 //		for(int i =0; i<strSequence.length(); i++) {

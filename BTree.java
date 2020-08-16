@@ -279,7 +279,7 @@ public class BTree {
 		File dumpFile = new File(outPutName);
 		FileWriter fileWriter = new FileWriter(dumpFile);
 		
-		printNodes(root, fileWriter, seqLength);
+		NodePrintToDump(root, fileWriter);
 		fileWriter.close();
 	
 	}
@@ -308,10 +308,8 @@ public class BTree {
 					e.printStackTrace();
 				}
 			}	
-//>>>>>>> 5964a6fda3c64ebd9b56dc87c344f395c1a1947c
 		}
 		if (node.isLeaf()) {
-
 			for (int j = 1; j <= objects; j++) {
 				String string = convertToString(node.getBTreeObject(j).getKey())+": "+node.getBTreeObject(j).getFrequency();
 				try {
@@ -324,7 +322,7 @@ public class BTree {
 		}	
 	}
 	
-	public void NodePrint(BTreeNode node ) throws IOException {
+	public void NodePrint(BTreeNode node) throws IOException {
 		int i=0;
 		for (i=0; i<node.getnumKeys();i++) {
 			if(!node.isLeaf()) {
@@ -334,6 +332,20 @@ public class BTree {
 		}
 		if(!node.isLeaf()) {
 			NodePrint(readNode(node.getChild(i)));
+		}
+	}
+	
+	public void NodePrintToDump(BTreeNode node, FileWriter fileWriter) throws IOException {
+		int i=0;
+		for (i=0; i<node.getnumKeys();i++) {
+			if(!node.isLeaf()) {
+				NodePrintToDump(readNode(node.getChild(i)),fileWriter);
+			}
+			String s = (convertToString(node.getBTreeObject(i).getKey())+": "+node.getBTreeObject(i).getFrequency());
+			fileWriter.write(s + "\n");
+		}
+		if(!node.isLeaf()) {
+			NodePrintToDump(readNode(node.getChild(i)),fileWriter);
 		}
 	}
 	//convert Long substring to String data type
