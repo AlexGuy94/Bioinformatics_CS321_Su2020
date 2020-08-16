@@ -1,26 +1,32 @@
 # Bioinformatics_CS321_Su2020
-
-Laying out some thoughts on the classes.  (Feel free to update names)
-
-Tree Object
-Var: Long DNA sequence, int frequency
-
-Methods: GetKey, SetKey, GetFrequency, SetFrequency, CompareTo(Tree), increaseFrequency
+CS321FinalProject
 
 
-BTreeNode
-Var: byte isLeaf, int NumberOfObjectsInNode, int byteLocationOfNode, degree, int parent pointer, Array<TreeObjects>, Array< int (child pointers)>
-  
-Methods: isleaf, setleaf, getNumObjects, setNumObjects, writeMetaData, isNodeFull, getParent, setParent, getChildren, setLocation, getLocation, getMaxBytes(for allocating space for a full node), readNode
+Team Members
+Alex Guy
+Ryan Josephson
+Andres Guzman
+
+Notes
+
+There is a cache, however it is not supported.
+Dump is not working as intended.
+
+Files
+
+Btree.java: An implementation of a BTree.
+BTreeNode: A Node class used by the BTree.
+BTreeObject.java
+GeneBankCreateBTree.java: Creates the BTree file
+GeneBankSearch.java: Searches the BTree 
+
+Compile and Run
+java GeneBankCreateBTree <0/1(no/with Cache)> <degree> <gbk file> <sequence length>
+[<cache size>] [<debug level>]
+
+java GeneBankSearch <0/1(no/with Cache)> <btree file> <query file> [<cache size>]
+[<debug level>]
 
 
-BTree
-Var: int degree, int sequenceLength, int RootLocation, RandomAccessFile bTreeFile,
+Usage Example: $ java GeneBankCreateBTree 0 6 test2.gbk 6
 
-Methods: Search(key), SplitNode, InsertTreeObject, readNodeFromFile, writeNodeToFile, writeMetaData, traverseTreeAndPrintToDump, TraverseTreeAndPrintToConsole,
-
-
-GeneBankSearch
-Var: 
-
-Methods: ConvertDNAtoBytes, ConvertBytestoDNA,

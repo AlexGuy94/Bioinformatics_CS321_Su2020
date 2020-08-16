@@ -69,6 +69,12 @@ public class BTreeNode {
     public BTreeObject getBTreeObject(int i) {
 		return this.treeObjects[i];
     }
+    
+    
+    //returns total number of objects
+    public int getNumObjects() {
+    	return this.treeObjects.length;
+    }
 	
 	/**
 	 * Sets treeObject at given index.

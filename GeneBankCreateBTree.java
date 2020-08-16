@@ -1,7 +1,10 @@
 
 
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.RandomAccessFile;
@@ -28,7 +31,7 @@ public class GeneBankCreateBTree {
 		//checks for correct args lenght
 		try {
 			
-				if(args.length < 3 || args.length > 5) {
+				if(args.length < 3 || args.length > 6) {
 					System.err.println("Incorrect argument length");
 					printUsage();
 				}
@@ -75,31 +78,46 @@ public class GeneBankCreateBTree {
 		//Create the Btree
 		
 		outputFileName = args[2] + ".btree.data." + sequenceLength + "." + degree;
-		dumpFileName = args[2] + ".btree.data." + sequenceLength + "." + degree;
-		
+		dumpFileName = args[2] + ".btree.data." + sequenceLength + "." + degree + ".txt";
+		String dumpName =dumpFileName;
+		int printLength = sequenceLength;
 		//
 		
+//<<<<<<< HEAD
 		String sequence = parseFile(gbkFile);
 		insertIntoBTree(sequence);
+//=======
+		parseFile(gbkFile);
+		
+		//prints out the dump file when debug = 1 = true;
+		
+		if(useDebug == true) {
+			
+			bTree.inorderTraversalPrint(dumpName, printLength);
+			
+			
+			
+		}
+//>>>>>>> 5964a6fda3c64ebd9b56dc87c344f395c1a1947c
 		System.out.println("done");
 			
 		
 	}
 	//function to dump tree with inorder traversal when debug = true 
-	public static void dumpTree() throws FileNotFoundException {
-		PrintStream o =new PrintStream(new File(dumpFileName));
-		
-		//breaks the dna sequence into substrings of sequence lenght k 
-				subSequence = "";
-				for(int i =0; i<strSequence.length(); i++) {
-					for(int j= sequenceLength; j< strSequence.length(); j++) {
-						if(!strSequence.substring(i,j).contains("n")){
-							subSequence += strSequence.substring(i,j);
-						}
-					}
-				}
-			
-	}
+//	public static void dumpTree() throws FileNotFoundException {
+//		PrintStream o =new PrintStream(new File(dumpFileName));
+//		
+//		//breaks the dna sequence into substrings of sequence lenght k 
+//				subSequence = "";
+//				for(int i =0; i<strSequence.length(); i++) {
+//					for(int j= sequenceLength; j< strSequence.length(); j++) {
+//						if(!strSequence.substring(i,j).contains("n")){
+//							subSequence += strSequence.substring(i,j);
+//						}
+//					}
+//				}
+//			
+//	}
 	
 	
 	//parses the given file, ignores everything but the genome
@@ -115,33 +133,41 @@ public class GeneBankCreateBTree {
 		String line = "";
 		strSequence = "";
 		
-		//starts scanning the file for sequence start
-		while(scan.hasNextLine()) {
+		
+		//scans the entire text file until the end
+		while (scan.hasNext()) {
+			//starts scanning the file for sequence start ie ORIGIN
+			while (scan.hasNextLine()) {
 				line = scan.nextLine();
-				if(line.contains("ORIGIN")) {   //NEED TO READ THROUGH CHECKING FOR MULTIPLE NUMBER OF i "ORINGIN"'S THEN LOOP THE PARSING SEQUENCE i TIMES.
-					startParse=true;
+				if (line.contains("ORIGIN")) { //NEED TO READ THROUGH CHECKING FOR MULTIPLE NUMBER OF i "ORINGIN"'S THEN LOOP THE PARSING SEQUENCE i TIMES.
+					startParse = true;
 					break;
-				}	
-		}
-		if(startParse == false) {
-			System.out.println("Origin not Found");
-			System.exit(1);
-		}
-
-		// starts dna sequence
-		if(startParse == true) {
-			while(scan.hasNextLine()){
-				if(scan.hasNext("//"))
-					break;
-				strSequence += scan.next();
-				
+				} else {
+					continue;
+				}
 			}
-			strSequence = strSequence.replaceAll("\\d", "");
-			strSequence = strSequence.toLowerCase();
+			// starts dna sequence
+			if (startParse == true) {
+				while (scan.hasNextLine()) {
+					if (scan.hasNext("//"))
+						break;
+					strSequence += scan.next();
+
+				}
+				strSequence = strSequence.replaceAll("\\d", "");
+				strSequence = strSequence.toLowerCase();
+				//using n to signify a break between multiple ORIGINS
+				strSequence += "n";
+				startParse = false;
+				line= "";
+			} 
 		}
+//<<<<<<< HEAD
 		return strSequence;
 	}
 		
+//=======
+//>>>>>>> 5964a6fda3c64ebd9b56dc87c344f395c1a1947c
 		//breaks the dna sequence into substrings of sequence lenght k 
 		
 		public static void insertIntoBTree(String strSequence) throws IOException {
@@ -178,6 +204,7 @@ public class GeneBankCreateBTree {
 			j++;
 		}
 		bTree.writeMeta();
+//<<<<<<< HEAD
 		bTree.inorderTraversalPrint();
 		}
 //		for(int i =0; i<strSequence.length(); i++) {
@@ -188,32 +215,23 @@ public class GeneBankCreateBTree {
 //				}
 //			}
 //		}
+//=======
+		
+
+
+	
+//>>>>>>> 5964a6fda3c64ebd9b56dc87c344f395c1a1947c
 	
 	public static void insertIntoBTree(BTree tree, String sub) throws IOException {
 		long key = convertToLong(sub);
 		tree.insert(key);
 	}
 	
-	
-	public static long encodeLong(String sequence) {
-		String s = sequence;
-	      s = s.replaceAll("a","00");
-	      s = s.replaceAll("t","11");
-	      s = s.replaceAll("c","01");
-	      s = s.replaceAll("g","10");
-	      Long m = 1l;
-	      m = m<<63; 
-	      return (Long.parseLong(s,2) | m);
-	}
-	
 	public static void printUsage() {
 		System.out.println("java GeneBankCreateBTree <0/1(no/with Cache)> <degree> <gbk file> <sequence length>\r\n" + 
 				"[<cache size>] [<debug level>]");
 	}
-	
-	
-	
-	
+
 	//convert DNA substring to Long data type
 		private static long convertToLong(String dna) {
 			dna = dna.toLowerCase();
@@ -223,7 +241,6 @@ public class GeneBankCreateBTree {
 		}
 	//convert Long substring to String data type
 		private static String convertToString(long dna) {
-			
 			String seq = Long.toString(dna,32);
 			return seq;
 		}
